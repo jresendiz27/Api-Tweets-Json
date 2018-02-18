@@ -1,0 +1,4 @@
+{
+    "contract": "https://raw.githubusercontent.com/jresendiz27/Api-Tweets-Config/master/api-contract.yml",
+    "config": "https://raw.githubusercontent.com/jresendiz27/Api-Tweets-Config/master/application.json"
+}
