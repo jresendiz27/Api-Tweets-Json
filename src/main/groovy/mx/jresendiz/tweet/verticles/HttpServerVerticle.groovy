@@ -1,6 +1,5 @@
 package mx.jresendiz.tweet.verticles
 
-import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.http.HttpServerOptions
@@ -14,7 +13,6 @@ import mx.jresendiz.tweet.handlers.TweetCountHandler
 import mx.jresendiz.tweet.handlers.UtilHandlers
 
 @Slf4j
-@CompileStatic
 class HttpServerVerticle extends AbstractVerticle {
     void start() {
         JsonObject config = vertx.getOrCreateContext().config()

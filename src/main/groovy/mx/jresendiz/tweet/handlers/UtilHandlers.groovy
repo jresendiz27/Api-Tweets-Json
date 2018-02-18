@@ -1,6 +1,5 @@
 package mx.jresendiz.tweet.handlers
 
-import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.vertx.core.AsyncResult
 import io.vertx.core.Handler
@@ -12,7 +11,6 @@ import mx.jresendiz.tweet.enums.StatusCodes
 import mx.jresendiz.tweet.messages.ResponseMessages
 
 @Slf4j
-@CompileStatic
 class UtilHandlers {
 
     static Handler<RoutingContext> METHOD_NOT_IMPLEMENTED_HANDLER = { handler ->

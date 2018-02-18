@@ -1,6 +1,5 @@
 package mx.jresendiz.tweet
 
-import groovy.transform.CompileStatic
 import groovy.util.logging.Slf4j
 import io.vertx.config.ConfigRetriever
 import io.vertx.config.ConfigRetrieverOptions
@@ -16,7 +15,6 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
 
 @Slf4j
-@CompileStatic
 class MainVerticle extends AbstractVerticle {
     ConcurrentMap<String, Boolean> webVerticlesIds = new ConcurrentHashMap<>()
 
