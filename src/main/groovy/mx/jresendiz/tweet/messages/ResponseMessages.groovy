@@ -6,6 +6,28 @@ import mx.jresendiz.tweet.enums.StatusCodes
 
 @CompileStatic
 class ResponseMessages {
+
+    static JsonObject healthStatusResponse(JsonObject travisServerResponse) {
+        JsonObject jsonObject = new JsonObject()
+
+        jsonObject.put("travis", new JsonObject()
+            .put("build_id", travisServerResponse.getJsonArray("builds").getJsonObject(0).getLong("id"))
+            .put("state", travisServerResponse.getJsonArray("builds").getJsonObject(0).getString("state"))
+            .put("repository", travisServerResponse.getJsonArray("builds").getJsonObject(0).getJsonObject("repository").getString("name")))
+
+        jsonObject.put("system", new JsonObject()
+            .put("os", System.getProperty("os.name"))
+            .put("java_version", System.getProperty("java.version")))
+
+        return jsonObject
+    }
+
+    static JsonObject tweeetCount(Long numberOfTweets) {
+        JsonObject jsonObject = new JsonObject()
+        jsonObject.put("count", numberOfTweets)
+        return jsonObject;
+    }
+
     static JsonObject serverMessage(Integer code, String description, String message = "") {
         JsonObject jsonObject = new JsonObject()
             .put("code", code)
