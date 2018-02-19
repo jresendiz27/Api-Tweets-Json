@@ -43,7 +43,7 @@ There's an specific endpoint in the API to retrieve the contract, look for `/def
 
 All the API is versioned inside a [DockerFile](./Dockerfile) and handles the other containers using a [Docker Compose](./docker-compose.yml) file to create the links, send environment variables and share volumes with the containers if needed.
 
-Also there's a [groovy script](.src/main/groovy/mx/jresendiz/tweet/scripts/TweetFileParser.groovy) that was used to read the information from the jsonl file provided and extracts the information from the file, creates a sql file to include in the migrations.
+Also there's a [groovy script](./src/main/groovy/mx/jresendiz/tweet/scripts/TweetFileParser.groovy) that was used to read the information from the jsonl file provided and extracts the information from the file, creates a sql file to include in the migrations.
 
 ## Known Issues
 
