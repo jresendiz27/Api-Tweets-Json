@@ -45,6 +45,9 @@ def mainVerticleName = "mx.jresendiz.tweet.MainVerticle"
 
 shadowJar {
     classifier = 'fat'
+    manifest{
+        attributes 'Main-Verticle': 'mx.jresendiz.tweet.MainVerticle'
+    }
     mergeServiceFiles {
         include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
     }
