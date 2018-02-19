@@ -1,0 +1,22 @@
+version: '3'
+services:
+  tweet-api-json-web:
+    build: .
+    container_name: 'tweet-api-json-web'
+    environment:
+      - database.host=tweet-api-json-postgis
+    ports:
+      - 8080:8080
+    links:
+      - 'tweet-api-json-postgis'
+  tweet-api-json-postgis:
+    image: "mdillon/postgis"
+    container_name: 'tweet-api-json-postgis'
+    volumes:
+      - ./.docker-volumes/postgis:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=n0m3l0s3
+      - POSTGRES_DB=tweet
+      - POSTGRES_USER=root
