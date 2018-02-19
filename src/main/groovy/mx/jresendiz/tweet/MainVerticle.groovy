@@ -10,6 +10,7 @@ import io.vertx.core.json.JsonArray
 import io.vertx.core.json.JsonObject
 import mx.jresendiz.tweet.handlers.UtilHandlers
 import mx.jresendiz.tweet.messages.LoggingMessages
+import org.flywaydb.core.Flyway
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentMap
@@ -29,19 +30,27 @@ class MainVerticle extends AbstractVerticle {
             .setType("git")
             .setConfig(new JsonObject()
             .put("url", "https://github.com/jresendiz27/Api-Tweets-Config.git")
-            .put("path", "build")
+            .put("path", "~/.local-config")
             .put("filesets",
             new JsonArray().add(new JsonObject().put("pattern", "*.json"))));
 
+        ConfigStoreOptions environmentStore = new ConfigStoreOptions()
+            .setType("env");
+
         ConfigRetrieverOptions options = new ConfigRetrieverOptions()
             .setScanPeriod(5000)
-            .addStore(gitStore);
+            .addStore(gitStore)
+            .addStore(environmentStore);
 
         ConfigRetriever retriever = ConfigRetriever.create(vertx, options);
 
         retriever.getConfig({ jsonConfig ->
-            JsonObject jsonObject = jsonConfig.result()
-            deploymentOptions.setConfig(jsonObject)
+            JsonObject remoteConfig = adaptConfiguration((Map) jsonConfig.result())
+
+            deploymentOptions.setConfig(remoteConfig)
+
+            executeDatabaseMigrations(remoteConfig)
+
             deployWebVerticles(deploymentOptions)
         })
 
@@ -53,6 +62,23 @@ class MainVerticle extends AbstractVerticle {
                 deployWebVerticles(deploymentOptions)
             }
         })
+    }
+
+    void executeDatabaseMigrations(JsonObject remoteConfig) {
+        Flyway flyway = new Flyway();
+        JsonObject databaseConnection = remoteConfig.getJsonObject("database");
+        JsonObject flywayConfiguration = remoteConfig.getJsonObject("flyway")
+        String jdbcUrl = "jdbc:postgresql://${databaseConnection.getString("host")}:${databaseConnection.getInteger("port")}/${databaseConnection.getString("database")}"
+
+        flyway.setDataSource(
+            jdbcUrl,
+            databaseConnection.getString("username"),
+            databaseConnection.getString("password"));
+        flyway.setBaselineOnMigrate(true)
+        flyway.setValidateOnMigrate(true)
+        flyway.setLocations(flywayConfiguration.getString("locations"))
+        flyway.repair()
+        flyway.migrate()
     }
 
     private void setupVertx() {
@@ -77,5 +103,26 @@ class MainVerticle extends AbstractVerticle {
                 log.info(LoggingMessages.VERTICLE_DEPLOYED.replace("@VerticleId", verticleId))
             }
         })
+    }
+
+    /*
+    Parses the configuration from database.host=foo to database { host:foo }
+    * */
+
+    private JsonObject adaptConfiguration(Map rawConfiguration) {
+        JsonObject parsedConfiguration = new JsonObject()
+        parsedConfiguration.put("database", new JsonObject())
+        parsedConfiguration.put("travis", new JsonObject())
+        parsedConfiguration.put("server", new JsonObject())
+        parsedConfiguration.put("flyway", new JsonObject())
+        rawConfiguration.each { key, value ->
+            List<String> splittedKey = key.split("\\.")
+            JsonObject configuration = parsedConfiguration.getJsonObject(splittedKey[0])
+            if(configuration) {
+                configuration.put(splittedKey[1], value)
+            }
+        }
+        parsedConfiguration.put("contract", rawConfiguration.get("contract"))
+        return parsedConfiguration
     }
 }
